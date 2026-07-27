@@ -150,6 +150,14 @@ function Harpoon.setup(self, partial_config)
     self.ui:configure(self.config.settings)
     self._extensions:emit(Extensions.event_names.SETUP_CALLED, self.config)
 
+    --- buffer.lua matches the current file against this group.  default = true
+    --- so a colorscheme defining it wins
+    vim.api.nvim_set_hl(
+        0,
+        "HarpoonCurrentFile",
+        { default = true, link = "CursorLineNr" }
+    )
+
     ---TODO: should we go through every seen list and update its config?
 
     if self.hooks_setup == false then

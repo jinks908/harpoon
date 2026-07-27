@@ -85,6 +85,10 @@ function M.get_default_config()
 
             ---@param list_item HarpoonListItem
             display = function(list_item)
+                if list_item.context == nil or list_item.context.row == nil then
+                    return list_item.value
+                end
+
                 return list_item.value .. ":" .. list_item.context.row
             end,
 

@@ -328,4 +328,15 @@ describe("list", function()
             { value = "threethree" },
         }, list.items)
     end)
+
+    it("display shows the row and tolerates a missing context", function()
+        local config = Config.merge_config()
+        local c = Config.get_config(config, "foo")
+        local list = List:new(c, "foo", {
+            { value = "one", context = { row = 12, col = 0 } },
+            { value = "two" },
+        })
+
+        eq({ "one:12", "two" }, list:display())
+    end)
 end)

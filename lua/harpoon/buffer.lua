@@ -28,16 +28,19 @@ function M.run_toggle_command(key)
 end
 
 ---@param bufnr number
-function M.setup_autocmds_and_keymaps(bufnr)
-    local curr_file = vim.api.nvim_buf_get_name(0)
+---@param curr_file? string the file that was current before the menu opened
+function M.setup_autocmds_and_keymaps(bufnr, curr_file)
+    curr_file = curr_file or vim.api.nvim_buf_get_name(0)
     local cmd = string.format(
         "autocmd Filetype harpoon "
             .. "let path = '%s' | call clearmatches() | "
-            -- move the cursor to the line containing the current filename
-            .. "call search('\\V'.path.'\\$') | "
+            -- move the cursor to the line containing the current filename,
+            -- allowing for the trailing ':<row>' that display appends
+            .. "call search('\\V'.path.'\\(:\\d\\+\\)\\?\\$') | "
             -- add a hl group to that line
-            .. "call matchadd('HarpoonCurrentFile', '\\V'.path.'\\$')",
-        curr_file:gsub("\\", "\\\\")
+            .. "call matchadd('HarpoonCurrentFile', "
+            .. "'\\V'.path.'\\(:\\d\\+\\)\\?\\$')",
+        (curr_file:gsub("\\", "\\\\"))
     )
     vim.cmd(cmd)
 

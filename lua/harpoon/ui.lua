@@ -1,6 +1,7 @@
 local Buffer = require("harpoon.buffer")
 local Logger = require("harpoon.logger")
 local Extensions = require("harpoon.extensions")
+local Path = require("plenary.path")
 
 ---@class HarpoonToggleOptions
 ---@field border? any this value is directly passed to nvim_open_win
@@ -79,8 +80,9 @@ end
 --- TODO: Toggle_opts should be where we get extra style and border options
 --- and we should create a nice minimum window
 ---@param toggle_opts HarpoonToggleOptions
+---@param curr_file? string the file that was current before the menu opened
 ---@return number,number
-function HarpoonUI:_create_window(toggle_opts)
+function HarpoonUI:_create_window(toggle_opts, curr_file)
     local win = vim.api.nvim_list_uis()
 
     local width = toggle_opts.ui_fallback_width
@@ -118,7 +120,7 @@ function HarpoonUI:_create_window(toggle_opts)
         error("Failed to create window")
     end
 
-    Buffer.setup_autocmds_and_keymaps(bufnr)
+    Buffer.setup_autocmds_and_keymaps(bufnr, curr_file)
 
     self.win_id = win_id
     vim.api.nvim_set_option_value("number", true, {
@@ -144,8 +146,16 @@ function HarpoonUI:toggle_quick_menu(list, opts)
     -- grab the current file before opening the quick menu
     local current_file = vim.api.nvim_buf_get_name(0)
 
+    -- the menu displays items relative to the list's root, so the current
+    -- file has to be normalized the same way for it to be matchable
+    local matchable_file = current_file
+    if list.config.get_root_dir then
+        matchable_file =
+            Path:new(current_file):make_relative(list.config.get_root_dir())
+    end
+
     Logger:log("ui#toggle_quick_menu#opening", list and list.name)
-    local win_id, bufnr = self:_create_window(opts)
+    local win_id, bufnr = self:_create_window(opts, matchable_file)
 
     self.win_id = win_id
     self.bufnr = bufnr
