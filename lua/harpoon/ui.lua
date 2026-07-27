@@ -150,8 +150,8 @@ function HarpoonUI:toggle_quick_menu(list, opts)
     -- file has to be normalized the same way for it to be matchable
     local matchable_file = current_file
     if list.config.get_root_dir then
-        matchable_file =
-            Path:new(current_file):make_relative(list.config.get_root_dir())
+        matchable_file = Path:new(current_file)
+            :make_relative(list.config.get_root_dir())
     end
 
     Logger:log("ui#toggle_quick_menu#opening", list and list.name)
