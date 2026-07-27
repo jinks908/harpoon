@@ -85,7 +85,7 @@ function M.get_default_config()
 
             ---@param list_item HarpoonListItem
             display = function(list_item)
-                return list_item.value
+                return list_item.value .. ":" .. list_item.context.row
             end,
 
             --- the select function is called when a user selects an item from
